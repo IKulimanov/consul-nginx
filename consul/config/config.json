@@ -1,0 +1,12 @@
+{
+  "services": {
+      "name": "web",
+      "port": 8080,
+      "checks": [
+        {
+          "args": ["curl", "192.168.122.68:8080"],
+          "interval": "5s"
+        }
+      ]
+    }
+}

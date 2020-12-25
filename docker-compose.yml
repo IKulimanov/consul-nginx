@@ -1,0 +1,32 @@
+version: '3'
+services:
+  consul:
+    image: consul
+    container_name: consul
+    ports:
+      - 8500:8500
+      - 8300:8300
+    volumes:
+      - "./consul/data/:/consul/data"
+      - "./consul/config/config.json:/consul/config/config.json"
+    command: agent -server -ui -enable-local-script-checks=true -bootstrap-expect=1 -client=0.0.0.0 -config-file=/consul/config/config.json
+  consul-template:
+    image: hashicorp/consul-template:alpine
+    container_name: consul-template
+    volumes:
+     - "./consul-template:/consul-template"
+     - "./nginx:/etc/nginx/conf.d/"
+    environment:
+     - consul:consul
+     - nginx:nginx
+    command: consul-template -config /consul-template/consul-template.hcl
+  nginx:
+    image: nginx:1.19.3-alpine
+    container_name: nginx
+    restart: on-failure:10
+    volumes:
+      - ./nginx:/etc/nginx/conf.d/
+    ports:
+        - 8989:8989
+    links: 
+        - consul-template

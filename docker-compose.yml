@@ -3,13 +3,19 @@ services:
   consul:
     image: consul
     container_name: consul
+    network_mode: host
+    environment:
+      - CONSUL_BIND_INTERFACE=enp1s0
+      - ui
+      - bootstrap
+      - client=0.0.0.0
+      - CONSUL_ALLOW_PRIVILEGED_PORTS=yes
     ports:
+      - 8600:8600
       - 8500:8500
       - 8300:8300
     volumes:
       - "./consul/data/:/consul/data"
-      - "./consul/config/config.json:/consul/config/config.json"
-    command: agent -server -ui -enable-local-script-checks=true -bootstrap-expect=1 -client=0.0.0.0 -config-file=/consul/config/config.json
   consul-template:
     image: hashicorp/consul-template:alpine
     container_name: consul-template

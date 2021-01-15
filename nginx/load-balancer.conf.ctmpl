@@ -1,3 +1,5 @@
+log_format compression '$remote_addr - $remote_user - $server_name [$time_local]' 				'"$http_referer" "$http_user_agent"';
+
 upstream backend {
 {{ range service "web" }}
   server {{ .Address }}:{{ .Port }};
@@ -7,14 +9,13 @@ upstream backend {
 
 server {
 
-  listen 80;
+  listen 8989;
  
   location / {
     proxy_pass http://backend;
-    proxy_set_header   X-Real-IP        $remote_addr;
-    proxy_set_header   X-Forwarded-For  $proxy_add_x_forwarded_for;
-    proxy_set_header   X-Forwarded-User  $remote_user;
-    access_log /var/log/nginx/access.log upstreamlog;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    access_log /var/log/nginx/access.log compression;
 
   }
 }
